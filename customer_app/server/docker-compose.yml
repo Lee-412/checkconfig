@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+
+  server:
+    build: ./
+    ports:
+      - "8081:8081"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - auth-network
+    restart: always  # Set restart policy to always
+
+volumes:
+  pgdata:
+  
+networks:
+  auth-network:
+    external: true

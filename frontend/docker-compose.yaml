@@ -1,0 +1,7 @@
+version: '3.8'
+services:
+  authstream-fe:
+    build: .
+    ports:
+      - "5174:5173"
+

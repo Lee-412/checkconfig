@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .animate-pulse-fast {
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-12 rounded-xl shadow-2xl text-center space-y-6">
+        <div class="flex justify-center animate-pulse-fast">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                stroke="currentColor" class="w-24 h-24 text-red-500">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+        </div>
+
+        <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight" data-th-text="${errorCode}">
+            404</h1>
+        <p class="text-lg text-gray-600" data-th-text="${errorMessage}">404</p>
+
+        <div class="flex justify-center mt-8">
+            <a data-th-href="${redirectUrl}"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition-colors duration-300">
+                Go Back Home
+            </a>
+        </div>
+        <p class="text-sm text-gray-500 mt-4">If you think this is a mistake, please contact support.</p>
+    </div>
+</body>
+
+</html>

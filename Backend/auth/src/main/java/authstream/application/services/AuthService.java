@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +36,12 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Object> login(String username, String password, String token) throws Exception {
+    public Pair<Object, Object> login(String username, String password, String token) throws Exception {
         AuthTableConfig config = authConfigRepository.findFirst();
 
         if (config == null) {
-            throw new IllegalStateException("Auth configuration not found");
+            // throw new IllegalStateException("Auth configuration not found");
+            return Pair.of(null, "Auth configuration not found");
         }
 
         String userTable = config.getUserTable();
@@ -51,17 +53,23 @@ public class AuthService {
         String storedHash = AuthUtils.fetchUserPassword(username, userTable, passwordAttribute, jdbcTemplate);
         System.out.println("storedHash: " + storedHash);
         if (storedHash == null) {
-            throw new IllegalArgumentException("User not found");
+            // throw new IllegalArgumentException("User not found");
+            return Pair.of(null, "User not found");
+
         }
 
         if (hashingType == HashingType.BCRYPT) {
             boolean matches = BCrypt.checkpw(password, storedHash);
             System.out.println("Password matches: " + matches);
             if (!matches) {
-                throw new IllegalArgumentException("Invalid username or password");
+                // throw new IllegalArgumentException("Invalid username or password");
+                return Pair.of(null, "Invalid username or password");
+
             }
         } else if (!storedHash.equals(hashedInput)) {
-            throw new IllegalArgumentException("Invalid username or password");
+            // throw new IllegalArgumentException("Invalid username or password");
+            return Pair.of(null, "Invalid username or password");
+
         }
 
         // Check token từ header
@@ -76,7 +84,9 @@ public class AuthService {
                 // Kiểm tra xem tokenBody có chứa "username":"banlamdoan" không
                 if (tokenBody.contains("\"username\":\"" + username + "\"")) {
                     System.out.println("Returning existing token");
-                    return AuthUtils.buildTokenResponse(token, existingEntry, "Using existing token");
+                    // return AuthUtils.buildTokenResponse(token, existingEntry, "Using existing
+                    // token");
+                    return Pair.of(existingEntry, null);
                 } else {
                     throw new IllegalArgumentException("Token does not belong to this user");
                 }
@@ -97,9 +107,15 @@ public class AuthService {
         // TokenEntry checktoken = TokenStoreService.read(checkCreateToken.);
         logger.info("check token create: {}", checkCreateToken);
         if (checkCreateToken == null) { // Nếu token đã tồn tại (rất hiếm với UUID)
-            return AuthUtils.buildTokenResponse(newToken, checkCreateToken, "Token already exists");
+            // return AuthUtils.buildTokenResponse(newToken, checkCreateToken, "Token
+            // already exists");
+            return Pair.of(newToken, null);
+
         }
-        return AuthUtils.buildTokenResponse(newToken, checkCreateToken, "New  fucking token generated");
+        // return AuthUtils.buildTokenResponse(newToken, checkCreateToken, "New fucking
+        // token generated");
+        return Pair.of(newToken, null);
+
     }
 
     public Map<String, Object> validateToken(String token) {

@@ -5,9 +5,9 @@ import pg from 'pg';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import morgan from 'morgan'; // Thêm morgan
-import vipRouter from './routes/vipRoutesAfter';
-import itemRouter from './routes/itemRoutesAfter';
-import userRouter from './routes/userRoutesAfter';
+import vipRouter from './routes/vipRoutesAfter.js';
+import itemRouter from './routes/itemRoutesAfter.js';
+import userRouter from './routes/userRoutesAfter.js';
 
 const { Pool } = pg;
 
@@ -39,8 +39,8 @@ app.use((req, res, next) => {
 // Tạo format tùy chỉnh để log chi tiết
 morgan.token('body', (req) => JSON.stringify(req.body)); // Log body
 morgan.token('cookies', (req) => JSON.stringify(req.headers.cookie || 'No cookies')); // Log cookies
-morgan.token('auth', (req) => req.headers['authorization'] || 'No auth header'); // Log token (Authorization header)
-morgan.token('user', (req) => (req.user ? JSON.stringify(req.user) : 'No user')); // Log thông tin user từ token
+morgan.token('auth', (req) => req.headers['Authorization'] || 'No auth header'); // Log token (Authorization header)
+morgan.token('user', (req) => (req.body ? JSON.stringify(req.body.username) : 'No user')); // Log thông tin user từ token
 
 // Sử dụng morgan với format tùy chỉnh
 app.use(
@@ -59,9 +59,9 @@ const SECRET = 'your-secret-key';
 
 // Middleware để verify token
 
-app.use('/items', itemRouter);
-app.use('/vipitems', vipRouter); // Virtual
-app.use('/users', userRouter); // User
+app.use('/api/items', itemRouter);
+app.use('/api/vipitems', vipRouter); // Virtual
+app.use('/api/users', userRouter); // User
 
 app.get('/', async (req, res) => {
   res.json({
@@ -69,14 +69,14 @@ app.get('/', async (req, res) => {
   })
 });
 
-app.post('/abc', async(req, res) => {
+app.post('/api/abc  ', async(req, res) => {
   const {username, password} = req.body;
   console.log("Anh yeu vcl")
   console.log(username);
   console.log(password);
   res.send("Dit con me cay vcl")
 }) 
-app.post('/register', async(req, res) => {
+app.post('/api/register', async(req, res) => {
   const {data, message} = req.body;
   console.log(data);
   console.log(message)
@@ -101,7 +101,8 @@ app.post('/register', async(req, res) => {
 
 })
 // Login)
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
+    const {authData} = req.body;
   const {data, message} = req.body;
   console.log(data);
   console.log(message)

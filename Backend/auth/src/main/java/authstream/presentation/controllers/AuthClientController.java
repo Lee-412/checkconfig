@@ -1,15 +1,22 @@
 package authstream.presentation.controllers;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import authstream.application.services.AuthService;
 import authstream.application.services.PerminssionClientService;
@@ -73,73 +80,124 @@ public class AuthClientController {
     // }
     // }
 
-    @PostMapping("/permissioncheck")
+@PostMapping("/permissioncheck")
     public ResponseEntity<Map<String, Object>> checkPermission(
             @RequestHeader(value = "X-Original-URI", required = false) String originalUri,
             @RequestHeader(value = "X-Original-Method", required = false) String originalMethod,
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestHeader(value = "Cookie", required = false) String cookieHeader,
             @RequestBody Object requestBody) {
+        ObjectMapper objectMapper = new ObjectMapper();
 
+        // In type của requestBody để debug
+        System.out.println("Type of requestBody: " + (requestBody != null ? requestBody.getClass().getName() : "null"));
+
+        // Logic chuyển từ Object sang Map<String, Object>
+        Map<String, Object> requestBodyMap;
+        try {
+            if (requestBody == null) {
+                // Trường hợp requestBody là null
+                requestBodyMap = new HashMap<>();
+                System.out.println("requestBody is null, returning empty map");
+            } else if (requestBody instanceof String) {
+                // Trường hợp requestBody là String (raw JSON)
+                requestBodyMap = objectMapper.readValue((String) requestBody, new TypeReference<Map<String, Object>>() {
+                });
+                System.out.println("Parsed String to Map: " + requestBodyMap);
+            } else if (requestBody instanceof Map) {
+                // Trường hợp requestBody đã là Map (đã được deserialize)
+                requestBodyMap = (Map<String, Object>) requestBody;
+                System.out.println("Directly casted to Map: " + requestBodyMap);
+            } else {
+                // Trường hợp khác (không mong đợi), trả về map rỗng hoặc xử lý theo ý mày
+                requestBodyMap = new HashMap<>();
+                System.out.println("Unexpected type, returning empty map: " + requestBody.getClass().getName());
+            }
+        } catch (JsonProcessingException e) {
+            // Xử lý lỗi khi parse JSON từ String
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Cannot parse requestBody to Map: " + e.getMessage());
+            System.out.println("Error parsing JSON: " + e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
+        // Logic xử lý với requestBodyMap (bây giờ là Map<String, Object>)
+        System.out.println("Username: " + requestBodyMap.get("username"));
+        System.out.println("Password: " + requestBodyMap.get("password"));
+
+        // Tạo response
+        // System.out.println(map.get("username"));
         System.out.println("Anh yeu em ");
         System.out.println(cookieHeader);
         System.out.println("Anh nho em");
         System.out.println(requestBody);
         System.out.println(originalUri);
         System.out.println(originalMethod);
-        return null;
-        // try {
-        // logger.info("ditmethuadoiroi", requestBody);
-        // if (requestBody == null) {
-        // requestBody = new HashMap<>();
-        // }
+        System.out.println(authHeader);
+        // return null;
+        try {
+            logger.info("ditmethuadoiroi", requestBodyMap);
+            if (requestBodyMap == null) {
+                requestBodyMap = new HashMap<>();
+            }
+            System.out.println(requestBodyMap);
+            String str2 = "/login";
+            // if (requestBodyMap.containsKey("password")) {
+            if (originalUri.toUpperCase().contains(str2.toUpperCase())) {
 
-        // if (requestBody.containsKey("password")) {
-        // String username = (String) requestBody.get("username");
-        // String password = (String) requestBody.get("password");
+                String username = (String) requestBodyMap.get("username");
+                String password = (String) requestBodyMap.get("password");
+                if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                    authHeader = authHeader.substring(7); // Lấy UUID sau "Bearer "
+                }
+                System.out.println("dit me thua doi roi co password"+authHeader);
 
-        // if (authHeader != null && authHeader.startsWith("Bearer ")) {
-        // authHeader = authHeader.substring(7); // Lấy UUID sau "Bearer "
-        // }
 
-        // if (username == null || password == null) {
-        // return ResponseEntity.badRequest()
-        // .body(requestBody);
-        // }
+                if (username == null || password == null) {
+                    return ResponseEntity.badRequest()
+                            .body(requestBodyMap);
+                }
 
-        // try {
-        // Pair<Object, Object> authHeaderInfo = authService.login(username, password,
-        // authHeader);
-        // if (authHeaderInfo.getRight() != null) {
-        // return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(requestBody);
+                try {
+                    Pair<Object, Object> authHeaderInfo = authService.login(username, password,
+                            authHeader);
 
-        // }
-        // requestBody.put("authData", authHeaderInfo.getLeft());
-        // return ResponseEntity.status(HttpStatus.ACCEPTED).body(requestBody);
-        // } catch (Exception e) {
-        // return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-        // .body(requestBody);
-        // }
-        // }
+                System.out.println("dit me thua doi roi co password, Pair"+authHeaderInfo);
 
-        // Pair<Map<String, Object>, Object> processedBody =
-        // perminssionClientService.checkPermission(
-        // originalUri, originalMethod, authHeader, cookieHeader, requestBody);
+                    if (authHeaderInfo.getRight() != null) {
+                        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(requestBodyMap);
 
-        // if (processedBody.getRight() != null) {
-        // return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        // .body(requestBody);
-        // } else {
-        // requestBody.put("authData", processedBody.getLeft());
-        // return ResponseEntity.status(HttpStatus.ACCEPTED).body(requestBody);
-        // }
+                    }
+                    requestBodyMap.put("authData", authHeaderInfo.getLeft());
+                    return ResponseEntity.status(HttpStatus.ACCEPTED).body(requestBodyMap);
+                } catch (Exception e) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(requestBodyMap);
+                }
+            }
 
-        // } catch (Exception e) {
-        // logger.error("Error processing request: {}", requestBody);
-        // return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-        // .body(requestBody);
-        // } finally {
-        // logger.info("default body", requestBody);
-        // }
+            Pair<Map<String, Object>, Object> processedBody = perminssionClientService.checkPermission(
+                    originalUri, originalMethod, authHeader, cookieHeader, requestBodyMap);
+
+                    System.out.println("processedBody: " + processedBody);
+            if (processedBody.getRight() != null) {
+                System.out.println(processedBody.getRight());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(requestBodyMap);
+            } else {
+                System.out.println(processedBody.getLeft());
+
+                requestBodyMap.put("authData", processedBody.getLeft());
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(requestBodyMap);
+            }
+
+        } catch (Exception e) {
+            logger.error("Error processing request: {}", requestBodyMap);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(requestBodyMap);
+        } finally {
+            logger.info("default body", requestBodyMap);
+        }
     }
+
 }

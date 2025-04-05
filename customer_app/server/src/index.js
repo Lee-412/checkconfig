@@ -100,9 +100,6 @@ app.post('/register', async(req, res) => {
 })
 // Login)
 app.post('/login', async (req, res) => {
-  const {data, message} = req.body;
-  console.log(data);
-  console.log(message)
   const { username, password } = req.body;
   console.log(username);
   try {

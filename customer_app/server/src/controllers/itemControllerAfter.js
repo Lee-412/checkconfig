@@ -85,6 +85,8 @@ export const updateItem = async(req, res) => {
 
 export const deleteItem = async(req, res) => {
   const authData = req.body?.authData
+  console.log("delete info");
+  
   console.log(authData);
   const item_id = req.params.id
   try {

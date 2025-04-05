@@ -70,7 +70,7 @@ export const updateItem = async(req, res) => {
   console.log(authData);
   const item_id = req.params.id
   try {
-    const exists = await pool.query("SELECT item_id FROM items WHERE id = $1", [item_id])
+    const exists = await pool.query("SELECT id FROM items WHERE id = $1", [item_id])
     if (exists.rows.length == 0) {
       return res.status(404).json({ message: 'Item not found' });
     }
@@ -88,7 +88,7 @@ export const deleteItem = async(req, res) => {
   console.log(authData);
   const item_id = req.params.id
   try {
-    const exists = await pool.query("SELECT item_id FROM items WHERE id = $1", [item_id])
+    const exists = await pool.query("SELECT id FROM items WHERE id = $1", [item_id])
     if (exists.rows.length == 0) {
       return res.status(404).json({ message: 'Item not found' });
     }

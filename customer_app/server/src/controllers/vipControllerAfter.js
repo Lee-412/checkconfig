@@ -12,7 +12,7 @@ export const getVipItems = async(req, res) => {
   const authData = req.body?.authData
   console.log(authData);
   try {
-    const result = await pool.query("SELECT * FROM vipitems")
+    const result = await pool.query("SELECT * FROM vipitems ORDER BY id")
     const items = result.rows
     console.log(items);
     

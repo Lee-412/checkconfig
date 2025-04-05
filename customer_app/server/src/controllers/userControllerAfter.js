@@ -19,7 +19,7 @@ export const getUsers = async(req, res) => {
   console.log(authData);
     // Fetch from database in real case
     try {
-      const result = await pool.query("SELECT * FROM users")
+      const result = await pool.query("SELECT * FROM users ORDER BY id")
       const items = result.rows
       console.log(items);
       

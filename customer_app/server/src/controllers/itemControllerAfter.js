@@ -16,7 +16,7 @@ export const getItems = async(req, res) => {
   console.log(authData);
   
   try {
-    const result = await pool.query("SELECT * FROM items")
+    const result = await pool.query("SELECT * FROM items ORDER BY id")
     const items = result.rows
     console.log(items);
     

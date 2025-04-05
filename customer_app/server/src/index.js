@@ -99,7 +99,6 @@ app.use(
   })
 );
 app.use(express.json());
-const requestArray=  ["http://localhost:5173"]
 app.use((req, res, next) => {
   const origin = req.headers.origin
   console.log(origin)

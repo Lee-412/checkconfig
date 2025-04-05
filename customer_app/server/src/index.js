@@ -1,84 +1,3 @@
-// import express from 'express';
-// import jwt from 'jsonwebtoken';
-// import pg from 'pg';
-// import cors from 'cors';
-// import bcrypt from 'bcrypt';
-
-// const { Pool } = pg;
-
-// const app = express();
-// app.use(express.json());
-// app.use(cors());
-
-// // Kết nối đến DB host trên Neon
-// const pool = new Pool({
-//   connectionString: 'postgresql://Linglooma_owner:npg_KZsn7Wl3LOdu@ep-snowy-fire-a831dkmt-pooler.eastus2.azure.neon.tech/Linglooma?sslmode=require',
-// });
-
-// const SECRET = 'your-secret-key';
-
-// // Middleware để verify token
-// const authenticateToken = (req, res, next) => {
-//   const authHeader = req.headers['authorization'];
-//   const token = authHeader && authHeader.split(' ')[1];
-//   if (!token) return res.sendStatus(401);
-
-//   jwt.verify(token, SECRET, (err, user) => {
-//     if (err) return res.sendStatus(403);
-//     req.user = user;
-//     next();
-//   });
-// };
-
-// app.get('/', async (req, res) => {
-//   res.send("Hello world");
-// });
-
-
-// app.post('/', async (req, res) => {
-//   res.send("Hello world");
-// });
-
-// // Login
-// app.post('/api/login', async (req, res) => {
-//   const { username, password } = req.body;
-//   try {
-//     const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
-//     const user = result.rows[0];
-//     if (!user || !(await bcrypt.compare(password, user.password))) {
-//       return res.status(401).json({ message: 'Invalid credentials' });
-//     }
-//     const token = jwt.sign({ id: user.id, role: user.role }, SECRET);
-//     res.json({ token });
-//   } catch (err) {
-//     res.status(500).json({ message: 'Server error', error: err.message });
-//   }
-// });
-
-// // CRUD Operations
-// app.get('/api/items', authenticateToken, async (req, res) => {
-//   try {
-//     const result = await pool.query('SELECT * FROM items WHERE created_by = $1', [req.user.id]);
-//     res.json(result.rows);
-//   } catch (err) {
-//     res.status(500).json({ message: 'Server error', error: err.message });
-//   }
-// });
-
-// app.post('/api/items', authenticateToken, async (req, res) => {
-//   const { name } = req.body;
-//   try {
-//     await pool.query('INSERT INTO items (name, created_by) VALUES ($1, $2)', [name, req.user.id]);
-//     res.sendStatus(201);
-//   } catch (err) {
-//     res.status(500).json({ message: 'Server error', error: err.message });
-//   }
-// });
-
-// app.listen(8081, () => {
-//   console.log('Server running on port 8081');
-// });
-
 
 import express from 'express';
 import jwt from 'jsonwebtoken';
@@ -86,6 +5,9 @@ import pg from 'pg';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import morgan from 'morgan'; // Thêm morgan
+import vipRouter from './routes/vipRoutes.js';
+import itemRouter from './routes/itemRoutes.js';
+import userRouter from './routes/userRoutes.js';
 
 const { Pool } = pg;
 
@@ -99,7 +21,6 @@ app.use(
   })
 );
 app.use(express.json());
-const requestArray=  ["http://localhost:5173"]
 app.use((req, res, next) => {
   const origin = req.headers.origin
   console.log(origin)
@@ -137,17 +58,10 @@ const pool = new Pool({
 const SECRET = 'your-secret-key';
 
 // Middleware để verify token
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (!token) return res.sendStatus(401);
 
-  jwt.verify(token, SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
+app.use('/items', itemRouter);
+app.use('/vipitems', vipRouter); // Virtual
+app.use('/users', userRouter); // User
 
 app.get('/', async (req, res) => {
   res.json({
@@ -155,16 +69,37 @@ app.get('/', async (req, res) => {
   })
 });
 
-app.post('/api/abc', async(req, res) => {
+app.post('/abc', async(req, res) => {
   const {username, password} = req.body;
   console.log("Anh yeu vcl")
   console.log(username);
   console.log(password);
   res.send("Dit con me cay vcl")
 }) 
+app.post('/register', async(req, res) => {
 
+  const { username, password, role} = req.body;
+  console.log(username);
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+    console.log(result.rows);
+    
+    if(result.rows.length === 0) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const result = await pool.query(
+        'INSERT INTO users (username, password, role) VALUES ($1, $2, $3) RETURNING *',
+        [username, hashedPassword, role]
+      );
+      return res.json({message: "success", result: result.rows[0]});
+    }
+    return res.status(409).json({ message: 'Username already exists' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+
+})
 // Login)
-app.post('/api/login', async (req, res) => {
+app.post('/login', async (req, res) => {
   const {data, message} = req.body;
   console.log(data);
   console.log(message)
@@ -183,25 +118,6 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// CRUD Operations
-app.get('/api/items', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM items WHERE created_by = $1', [req.user.id]);
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-});
-
-app.post('/api/items', async (req, res) => {
-  const { name } = req.body;
-  try {
-    await pool.query('INSERT INTO items (name, created_by) VALUES ($1, $2)', [name, req.user.id]);
-    res.sendStatus(201);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-});
 
 app.listen(8081, () => {
   console.log('Server running on port 8081');

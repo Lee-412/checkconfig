@@ -13,7 +13,7 @@ let items = []; // Mô phỏng DB
 
 export const getItems = async(req, res) => {
   try {
-    const result = await pool.query("SELECT * FROM items")
+    const result = await pool.query("SELECT * FROM items ORDER BY id")
     items = result.rows
     console.log(items);
     

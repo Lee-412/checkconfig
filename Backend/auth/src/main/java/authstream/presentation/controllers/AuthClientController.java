@@ -1,11 +1,14 @@
 package authstream.presentation.controllers;
 
 import java.util.HashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -87,6 +94,46 @@ public class AuthClientController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestHeader(value = "Cookie", required = false) String cookieHeader,
             @RequestBody Object requestBody) {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // In type của requestBody để debug
+        System.out.println("Type of requestBody: " + (requestBody != null ? requestBody.getClass().getName() : "null"));
+
+        // Logic chuyển từ Object sang Map<String, Object>
+        Map<String, Object> requestBodyMap;
+        try {
+            if (requestBody == null) {
+                // Trường hợp requestBody là null
+                requestBodyMap = new HashMap<>();
+                System.out.println("requestBody is null, returning empty map");
+            } else if (requestBody instanceof String) {
+                // Trường hợp requestBody là String (raw JSON)
+                requestBodyMap = objectMapper.readValue((String) requestBody, new TypeReference<Map<String, Object>>() {
+                });
+                System.out.println("Parsed String to Map: " + requestBodyMap);
+            } else if (requestBody instanceof Map) {
+                // Trường hợp requestBody đã là Map (đã được deserialize)
+                requestBodyMap = (Map<String, Object>) requestBody;
+                System.out.println("Directly casted to Map: " + requestBodyMap);
+            } else {
+                // Trường hợp khác (không mong đợi), trả về map rỗng hoặc xử lý theo ý mày
+                requestBodyMap = new HashMap<>();
+                System.out.println("Unexpected type, returning empty map: " + requestBody.getClass().getName());
+            }
+        } catch (JsonProcessingException e) {
+            // Xử lý lỗi khi parse JSON từ String
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Cannot parse requestBody to Map: " + e.getMessage());
+            System.out.println("Error parsing JSON: " + e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
+        // Logic xử lý với requestBodyMap (bây giờ là Map<String, Object>)
+        System.out.println("Username: " + requestBodyMap.get("username"));
+        System.out.println("Password: " + requestBodyMap.get("password"));
+
+        // Tạo response
+        // System.out.println(map.get("username"));
         ObjectMapper objectMapper = new ObjectMapper();
 
         // In type của requestBody để debug

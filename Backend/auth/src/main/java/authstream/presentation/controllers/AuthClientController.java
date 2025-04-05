@@ -80,7 +80,13 @@ public class AuthClientController {
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestHeader(value = "Cookie", required = false) String cookieHeader,
             @RequestBody Object requestBody) {
-        logger.info("ditoiroi", requestBody);
+
+        System.out.println("Anh yeu em ");
+        System.out.println(cookieHeader);
+        System.out.println("Anh nho em");
+        System.out.println(requestBody);
+        System.out.println(originalUri);
+        System.out.println(originalMethod);
         return null;
         // try {
         // logger.info("ditmethuadoiroi", requestBody);

@@ -46,6 +46,7 @@ public class validString {
             dbname = uri.getPath() != null ? uri.getPath().replaceFirst("/", "") : "";
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Invalid URI format: " + e.getMessage());
+            
         }
 
         if (host == null || host.isEmpty()) {
@@ -89,9 +90,60 @@ public class validString {
         return Pair.of(connectionString,null);
     }
 
-    // public static void main(String[] args) {
-    //     String test = "wtif";
-    //     Pair<String,Object> result = buildConnectionString(wtif);
+    // backup build Connection String
+    public static Pair<String, Object> buildConnectionStringData(AdminDto adminDto) throws IllegalArgumentException {
+        String host;
+        String dbname;
+        try {
+            URI uri = new URI(adminDto.getUri());
+            host = uri.getHost();
+            dbname = uri.getPath() != null ? uri.getPath().replaceFirst("/", "") : "";
+        } catch (URISyntaxException e) {
+            return Pair.of(null, "Invalid URI format");
 
-    // }
+        }
+
+        if (host == null || host.isEmpty()) {
+            // throw new IllegalArgumentException("Host is required in URI");
+            return Pair.of(null, "Host is required in URI");
+
+        }
+
+        int port;
+        try {
+            port = adminDto.getPort();
+            if (port <= 0 || port > 65535) {
+                // throw new IllegalArgumentException("Port must be between 1 and 65535");
+                return Pair.of(null, "Port must be between 1 and 65535");
+            }
+        } catch (Exception e) {
+            return Pair.of(null, "Something wrong with check port:" + e.getMessage());
+            
+        }
+
+        String sslModeParam = adminDto.getSslMode().name().toLowerCase();
+        String connectionString;
+        switch (adminDto.getDatabaseType()) {
+            case MYSQL:
+                String useSSL = sslModeParam.equals("disabled") ? "false" : "true";
+                connectionString = String.format("jdbc:mysql://%s:%d/%s?user=%s&password=%s&useSSL=%s",
+                        host, port, dbname, adminDto.getDatabaseUsername(), adminDto.getDatabasePassword(), useSSL);
+                break;
+            case POSTGRESQL:
+                connectionString = String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s&sslmode=%s",
+                        host, port, dbname, adminDto.getDatabaseUsername(), adminDto.getDatabasePassword(),
+                        sslModeParam);
+                break;
+            case MONGODB:
+                // throw new IllegalArgumentException("MongoDB connection not supported via JDBC");
+            return Pair.of(null, "MongoDB connection not supported via JDBC");
+
+                default:
+                // throw new IllegalArgumentException("Unsupported database type");
+                            return Pair.of(null, "Unsupported database type");
+
+
+        }
+        return Pair.of(connectionString,null);
+    }
 }

@@ -14,7 +14,11 @@ public class DatabaseConnectionService {
         try (Connection connection = DriverManager.getConnection(connectionString)) {
             return Pair.of(true, "Connected successfully!");
         } catch (SQLException e) {
-            return Pair.of(false, "Database connection failed: " + e.getMessage());
+            if(e.getSQLState() == "08001") {
+                return Pair.of(false, "Database connection failed: Please check your database Port");
+
+            }
+            return Pair.of(false, "Database connection failed: " +e.getMessage());
         }
     }
 

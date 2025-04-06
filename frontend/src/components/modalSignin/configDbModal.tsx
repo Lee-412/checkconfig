@@ -211,7 +211,7 @@ const ConfigDBModal = ({
               name="uri"
               value={dbConfig.uri}
               onChange={handleChange}
-              placeholder="URI"
+              placeholder="e.g: postgresql://example.com:5432/db?user=admin&password=pass&sslmode=require"
               disabled={loading}
             />
           </div>
@@ -258,7 +258,7 @@ const ConfigDBModal = ({
             />
           </div>
 
-          <div>
+          {/* <div>
             <Input
               name="connectionString"
               value={dbConfig.connectionString}
@@ -266,7 +266,7 @@ const ConfigDBModal = ({
               placeholder={getConnectionStringPlaceholder()}
               disabled={loading}
             />
-          </div>
+          </div> */}
 
           <div>
             <select

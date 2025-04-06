@@ -1,3 +1,5 @@
+import { useConnectionStore } from "../../utils/connectionStore";
+import { setConnectionString } from "../../utils/dbConnectionStore";
 import axiosClient from "../axiosClient";
 import { DbConfig, DbPreviewRequest, TableConfig, RegisterData, RegisterResponse, SigninData, SignInResponse } from "../type";
 
@@ -40,9 +42,14 @@ import { DbConfig, DbPreviewRequest, TableConfig, RegisterData, RegisterResponse
       {
         try{
           const response = await axiosClient.post("/previews/viewschema",data);
+          console.log(response.data);
+    
+          setConnectionString(response.data.connectionString);
           return response.data;
         }
         catch(error){
+          console.log("vailonconchon get Schema");
+          
           throw error;
         }
       },

@@ -73,6 +73,21 @@ const groupService = {
       throw error;
     }
   },
+  deleteGroupUser: async ({
+    idUserDelete,
+    idGroupDelete,
+  }: {
+    idUserDelete: string;
+    idGroupDelete: string;
+  }): Promise<UserGroup> => {
+    try {
+      const response = await axiosClient.delete(`/user-groups/user/${idUserDelete}/group/${idGroupDelete}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  
 
   editGroupUser: async(updatedGroupUser:UserGroup):Promise<UserGroup>=>{
     try{

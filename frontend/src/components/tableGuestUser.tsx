@@ -179,8 +179,9 @@ const TableGuestUser = ({ users }: TableGuestUserProps) => {
     }
   };
 
-  const handleImportUsers = async (fileContent: string) => {
+  const handleImportUsers = async (fileContent: File) => {
     try {
+      // Gọi mutation để gửi file
       createBulkUsersMutation.mutate(fileContent, {
         onSuccess: () => {
           toast.success("Users imported successfully");
@@ -194,7 +195,7 @@ const TableGuestUser = ({ users }: TableGuestUserProps) => {
       toast.error("Failed to import users");
     }
   };
-
+  
   return (
     <div className="w-full bg-white dark:bg-background border p-5 rounded-lg shadow-md">
       <div className="flex items-center justify-between mb-4">

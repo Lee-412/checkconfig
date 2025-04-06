@@ -87,7 +87,7 @@ const TemplateView = () => {
                     Nginx.conf
                   </h3>
                 </div>
-                <pre className="bg-white dark:bg-gray-800 p-4 rounded-md text-sm overflow-auto border border-gray-200 dark:border-gray-600 relative">
+                <pre className="bg-white dark:bg-gray-800 p-4 rounded-md text-sm overflow-auto border border-gray-200 dark:border-gray-600 relative max-h-[500px]">
                   <code className="text-gray-900 dark:text-gray-100">
                     {nginxLoading
                       ? "Loading..."

@@ -16,6 +16,7 @@ public class DatabaseClass {
     public static class Schema {
         private String databaseName;
         private List<Table> databaseSchema;
+        private String connectionString;
     }
 
     @Getter

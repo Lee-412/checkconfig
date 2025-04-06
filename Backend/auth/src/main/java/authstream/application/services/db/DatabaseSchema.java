@@ -72,7 +72,7 @@ public class DatabaseSchema {
             }
             tables.close();
 
-            return new Schema(databaseName, tablesList);
+            return new Schema(databaseName, tablesList,connectionString);
         }
     }
 

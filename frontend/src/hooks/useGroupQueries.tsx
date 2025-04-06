@@ -66,6 +66,15 @@
     );
   };
 
+  export const useDeleteUserInGroups = () => {
+    return useMutationAction<UserGroup, { idUserDelete: string; idGroupDelete: string }>(
+      ["groups"],
+      groupService.deleteGroupUser
+    );
+    
+  };
+  
+
   export const useDeleteMultipleGroups = () => {
     const queryClient = useQueryClient();
     return useMutation<{ success: boolean }, Error, string[]>({

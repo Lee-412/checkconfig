@@ -22,6 +22,7 @@ import { UserGroup, User } from "../../api/type";
 import {
   useGetUserGroups,
   useCreateUserGroups,
+  useDeleteUserInGroups,
 } from "../../hooks/useGroupQueries";
 import { useGetUserById, useDeleteUsers } from "../../hooks/useUserQueries";
 import AddUsersModal from "./addUser";
@@ -48,8 +49,9 @@ const GroupUsersModal = ({
 }: GroupUsersModalProps) => {
   const { data: userGroups = [], isFetching } = useGetUserGroups();
   const getUserByIdMutation = useGetUserById();
-  const deleteUserMutation = useDeleteUsers();
+  // const deleteUserMutation = useDeleteUsers();
   const createUserGroupsMutation = useCreateUserGroups();
+  const deleteUserGroupsMutation = useDeleteUserInGroups();
   const [isAddUsersOpen, setIsAddUsersOpen] = useState(false);
   const [usersData, setUsersData] = useState<User[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -88,22 +90,21 @@ const GroupUsersModal = ({
     [groupUsers, currentPage]
   );
 
-  const handleDeleteUser = (userId: string) => {
-    deleteUserMutation.mutate(userId, {
-      onSuccess: () => {
-        toast.success("User removed from group successfully");
-
-        // Update local state
-        setUsersData((prev) => prev.filter((user) => user.id !== userId));
-
-        // Refetch user groups to update the list
-        refetch();
-      },
-      onError: (error) => {
-        toast.error(`Failed to remove user: ${error.message}`);
-      },
-    });
+  const handleDeleteUser = (userId: string, groupId: string) => {
+    deleteUserGroupsMutation.mutate(
+      { idUserDelete: userId, idGroupDelete: groupId }, 
+      {
+        onSuccess: () => {
+          toast.success(`User ${userId} removed successfully`);
+          setUsersData((prev) => prev.filter((user) => user.id !== userId));
+        },
+        onError: (error) => {
+          toast.error(`Failed to remove user ${userId}: ${error.message}`);
+        },
+      }
+    );
   };
+  
 
   const handleAddUsers = (newUserGroups: UserGroup[]) => {
     newUserGroups.forEach((userGroup) => {
@@ -190,7 +191,7 @@ const GroupUsersModal = ({
                       <Button
                         variant="destructive"
                         size="icon"
-                        onClick={() => handleDeleteUser(userGroup.userId)}
+                        onClick={() => handleDeleteUser(userGroup.userId, userGroup.groupId)}
                       >
                         <Trash className="w-4 h-4" />
                       </Button>

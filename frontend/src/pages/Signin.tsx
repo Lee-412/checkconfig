@@ -30,6 +30,8 @@ import {
   tableSchema,
 } from "../api/type";
 import LoadingBar from "../components/LoadingBar";
+import { useConnectionStore } from "../utils/connectionStore";
+import { getConnectionString } from "../utils/dbConnectionStore";
 
 const SignIn = () => {
   const [username, setEmail] = useState("");
@@ -176,6 +178,7 @@ const SignIn = () => {
           },
         }
       );
+
     } catch (error) {
       toast.error("Error fetching schema");
     }
@@ -222,8 +225,13 @@ const SignIn = () => {
 
   const handlePreviewTable = async (data: tableSchema[]) => {
     try {
+
+      const connStr = getConnectionString();
+      console.log("vaicaloon connStr: " + connStr);
+      
+   
       previewDataMutation.mutate(
-        { tables: data, connectionString: config.connectionString },
+        { tables: data, connectionString: connStr},
         {
           onSuccess: (response) => {
             setConfig({

@@ -15,26 +15,46 @@ import org.apache.commons.lang3.tuple.Pair;
 import authstream.application.dtos.ApiResponse;
 
 public class DataReplicationService {
-
-    public static Pair<Boolean, String> replicateData(String sourceConnectionString, String destinationConnectionString) {
+    public static Pair<Boolean, String> replicateData(String sourceConnectionString,
+            String destinationConnectionString, List<String> TableNames) {
         try (Connection sourceConn = DriverManager.getConnection(sourceConnectionString);
-             Connection destConn = DriverManager.getConnection(destinationConnectionString)) {
+                Connection destConn = DriverManager.getConnection(destinationConnectionString)) {
 
             DatabaseMetaData sourceMetaData = sourceConn.getMetaData();
-            ResultSet tables = sourceMetaData.getTables(null, null, "%", new String[]{"TABLE"});
-            List<String> tableNames = new ArrayList<>();
+            ResultSet tables = sourceMetaData.getTables(null, null, "%", new String[] { "TABLE" });
+            List<String> allTableNames = new ArrayList<>();
 
             while (tables.next()) {
-                tableNames.add(tables.getString("TABLE_NAME"));
+                allTableNames.add(tables.getString("TABLE_NAME"));
             }
             tables.close();
 
-            if (tableNames.isEmpty()) {
+            if (allTableNames.isEmpty()) {
                 return Pair.of(false, "No tables found in source database");
             }
 
+            // Determine which tables to replicate
+            List<String> tablesToReplicate;
+            if (TableNames == null || TableNames.isEmpty()) {
+                tablesToReplicate = allTableNames; // Replicate all tables if no specific list is provided
+            } else {
+                tablesToReplicate = new ArrayList<>();
+                for (String requestedTable : TableNames) {
+                    for (String existingTable : allTableNames) {
+                        if (existingTable.equalsIgnoreCase(requestedTable)) {
+                            tablesToReplicate.add(existingTable);
+                            break;
+                        }
+                    }
+                }
+                if (tablesToReplicate.isEmpty()) {
+                    return Pair.of(false, "None of the specified tables (" + String.join(", ", TableNames)
+                            + ") exist in the source database");
+                }
+            }
+
             Statement destStmt = destConn.createStatement();
-            for (String tableName : tableNames) {
+            for (String tableName : tablesToReplicate) {
                 try {
                     destStmt.execute("DROP TABLE IF EXISTS " + tableName + " CASCADE");
                 } catch (SQLException e) {
@@ -81,10 +101,11 @@ public class DataReplicationService {
 
                 String selectQuery = "SELECT * FROM " + tableName;
                 try (PreparedStatement sourceStmt = sourceConn.prepareStatement(selectQuery);
-                     ResultSet rs = sourceStmt.executeQuery()) {
+                        ResultSet rs = sourceStmt.executeQuery()) {
 
                     int columnCount = rs.getMetaData().getColumnCount();
-                    String insertQuery = "INSERT INTO " + tableName + " VALUES (" + "?, ".repeat(columnCount - 1) + "?)";
+                    String insertQuery = "INSERT INTO " + tableName + " VALUES (" + "?, ".repeat(columnCount - 1)
+                            + "?)";
                     try (PreparedStatement insertStmt = destConn.prepareStatement(insertQuery)) {
                         while (rs.next()) {
                             for (int i = 1; i <= columnCount; i++) {
@@ -95,29 +116,34 @@ public class DataReplicationService {
                         insertStmt.executeBatch();
                     }
                 } catch (SQLException e) {
-                     return Pair.of(false, "Failed to copy data for table " + tableName + ": " + e.getMessage());
-                   
+                    return Pair.of(false, "Failed to copy data for table " + tableName + ": " + e.getMessage());
                 }
             }
 
             destStmt.close();
-            return Pair.of(true, "");
+            return Pair.of(true, "Successfully replicated tables: " + String.join(", ", tablesToReplicate));
 
         } catch (SQLException e) {
-            // return Pair.of(false, "Database connection failed: " + e.getMessage());
-
-                ApiResponse result = new ApiResponse(false,"Failed to copy data for table" +":"+e.getMessage());
-                return Pair.of(result.getData().equals(true), result.getMessage());
+            ApiResponse result = new ApiResponse(false, "Failed to copy data for table: " + e.getMessage());
+            return Pair.of(result.getData().equals(true), result.getMessage());
         }
     }
 
     public static void main(String[] args) {
         String destination = "jdbc:postgresql://localhost:5432/?user=postgres&password=123456";
-        String source = "jdbc:postgresql://ep-snowy-fire-.eastus2.azure.neon.tech:5432/Linglooma?user=Linglooma_owner&password=npg_KZsn7Wl3LOdu&sslmode=require";
+        // String source =
+        // "jdbc:postgresql://ep-snowy-fire-a831dkmt.eastus2.azure.neon.tech:5432/Linglooma"
+        // +
+        // "?user=Linglooma_owner" +
+        // "&password=npg_KZsn7Wl3LOdu" +
+        // "&sslmode=require";
+        String source = "jdbc:postgresql://ep-snowy-fire-a831dkmt.eastus2.azure.neon.tech:5432/Linglooma?user=Linglooma_owner&password=npg_KZsn7Wl3LOdu&sslmode=require";
 
-        Pair<Boolean, String> result = replicateData(source, destination);
+        List<String> tablesToReplicate = List.of("users", "items", "vipitems"); // Example table names
+        Pair<Boolean, String> result = replicateData(source, destination, tablesToReplicate);
+
         if (result.getLeft()) {
-            System.out.println("Data replication successful!");
+            System.out.println("Data replication successful: " + result.getRight());
         } else {
             System.err.println("Data replication failed: " + result.getRight());
         }

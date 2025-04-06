@@ -1,8 +1,10 @@
 package authstream.presentation.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -18,8 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import authstream.application.dtos.AdminDto;
 import authstream.application.dtos.ApiResponse;
+import authstream.application.dtos.TableInfo;
 import authstream.application.services.AdminService;
 import authstream.application.services.RouteService;
+import authstream.application.services.db.DataReplicationService;
 
 @RestController
 @RequestMapping("/admins/config")
@@ -36,7 +40,24 @@ public class AdminController {
     public ResponseEntity<ApiResponse> createAdmin(@RequestBody AdminDto adminDto) {
 
         try {
+            List<TableInfo> replicaTableList = adminDto.getTableIncludeList();
+            List<String> replicaTableNames = new ArrayList<>();
+            for (TableInfo table : replicaTableList) {
+                String name = table.getTableName();
+                replicaTableNames.add(name);
+            }
+            System.err.println("------------------------- check------names");
+            System.err.println(replicaTableNames.toString());
             AdminDto createdAdmin = adminService.createAdmin(adminDto);
+            System.err.println(adminDto.getConnectionString());
+            Pair<Boolean, String> replicateStatus = DataReplicationService.replicateData(adminDto.getConnectionString(),
+                    "jdbc:postgresql://localhost:5432/?user=postgres&password=123456", replicaTableNames);
+
+            System.err.println(replicateStatus.getLeft());
+            if (replicateStatus.getLeft() == false) {
+                return ResponseEntity.status(509).body(
+                        new ApiResponse(replicateStatus.getRight(), null));
+            }
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ApiResponse(createdAdmin, "create Admin config successfully"));
         } catch (Exception e) {

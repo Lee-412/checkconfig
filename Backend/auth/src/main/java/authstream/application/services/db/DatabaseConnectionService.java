@@ -19,6 +19,8 @@ public class DatabaseConnectionService {
     }
 
     public static void main(String[] args) {
+        // String testConnectionString =
+        // "jdbc:postgresql://ep-snowy-fire-a831dkmt.eastus2.azure.neon.tech:5432/Linglooma?user=Linglooma_owner&password=npg_KZsn7Wl3LOdu&sslmode=require";
         String testConnectionString = "jdbc:postgresql://ep-snowy-fire-a831dkmt.eastus2.azure.neon.tech:5432/Linglooma?user=Linglooma_owner&password=npg_KZsn7Wl3LOdu&sslmode=require";
         Pair<Boolean, String> result = checkDatabaseConnection(testConnectionString);
         System.out.println("Success: " + result.getLeft());

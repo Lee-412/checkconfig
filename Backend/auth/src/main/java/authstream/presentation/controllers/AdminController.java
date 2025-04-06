@@ -50,12 +50,13 @@ public class AdminController {
             System.err.println(replicaTableNames.toString());
             AdminDto createdAdmin = adminService.createAdmin(adminDto);
             System.err.println(adminDto.getConnectionString());
+            System.err.println(adminDto.getUri());
             Pair<Boolean, String> replicateStatus = DataReplicationService.replicateData(adminDto.getConnectionString(),
                     "jdbc:postgresql://localhost:5432/?user=postgres&password=123456", replicaTableNames);
 
             System.err.println(replicateStatus.getLeft());
             if (replicateStatus.getLeft() == false) {
-                return ResponseEntity.status(509).body(
+                return ResponseEntity.status(400).body(
                         new ApiResponse(replicateStatus.getRight(), null));
             }
             return ResponseEntity.status(HttpStatus.OK)

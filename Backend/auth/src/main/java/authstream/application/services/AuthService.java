@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import authstream.application.services.hashing.HashingService;
 import authstream.application.services.hashing.HashingType;
+import authstream.application.services.jwt.JwtService;
+import authstream.application.services.jwt.TokenResponse;
 import authstream.application.services.kv.TokenEntry;
 import authstream.application.services.kv.TokenStoreService;
 import authstream.domain.entities.AuthTableConfig;
@@ -76,6 +78,7 @@ public class AuthService {
         System.out.println("Token received: " + token);
         if (token != null && !token.isEmpty()) {
             TokenEntry existingEntry = TokenStoreService.read(token);
+
             System.out.println("Existing entry: " + (existingEntry != null ? existingEntry.toString() : "null"));
             if (existingEntry != null && !existingEntry.isExpired()) {
                 System.out.println("Token expired: " + existingEntry.isExpired());
@@ -95,20 +98,29 @@ public class AuthService {
 
         // Sinh token mới
         System.out.println("Generating new token");
-        String newToken = UUID.randomUUID().toString();
+        // String newToken = UUID.randomUUID().toString();
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("username", username);
+        claims.put("password", password);
+        // Define secret key and TTL (time to live)
+        String secretKey = "mySuperSecretKey1234567890123456"; // Should be at least 32 chars for HS256
+        long ttlSeconds = 3600;
+        TokenResponse tokenResponse = JwtService.createToken(claims, secretKey, ttlSeconds);
+        String newToken = tokenResponse.getToken();
+
+        // String newToken
         Map<String, String> tokenBody = new HashMap<>();
         tokenBody.put("username", username);
         TokenEntry tokenEntry = new TokenEntry(
                 // new TokenEntry.Message(username),
-                new TokenEntry.Message(new ObjectMapper().writeValueAsString(tokenBody)),
+                new TokenEntry.Message(new ObjectMapper().writeValueAsString(claims)),
                 Instant.now(),
                 Instant.now().plusSeconds(3600));
         TokenEntry checkCreateToken = TokenStoreService.create(newToken, tokenEntry);
         // TokenEntry checktoken = TokenStoreService.read(checkCreateToken.);
-        logger.info("check token create: {}", checkCreateToken);
-        if (checkCreateToken == null) { // Nếu token đã tồn tại (rất hiếm với UUID)
-            // return AuthUtils.buildTokenResponse(newToken, checkCreateToken, "Token
-            // already exists");
+        logger.info("check token create: {}", checkCreateToken.toString());
+        if (checkCreateToken == null) {
+
             return Pair.of(newToken, null);
 
         }
@@ -120,6 +132,9 @@ public class AuthService {
 
     public Map<String, Object> validateToken(String token) {
         TokenEntry entry = TokenStoreService.read(token);
+        System.out.println("dcm hashmap");
+        System.out.println(entry.getMessage());
+
         if (entry == null || entry.isExpired()) {
             throw new IllegalArgumentException("Invalid or expired token");
         }

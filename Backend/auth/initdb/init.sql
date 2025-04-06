@@ -27,6 +27,25 @@ CREATE TABLE IF NOT EXISTS auth_table_config (
     hash_config JSONB
 );
 
+-- CREATE TABLE IF NOT EXISTS admins (
+--     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     username VARCHAR(255) NOT NULL UNIQUE,
+--     password VARCHAR(255) NOT NULL,
+--     uri TEXT,
+--     database_username VARCHAR(255) NOT NULL,
+--     database_password VARCHAR(255) NOT NULL,
+--     database_type VARCHAR(50) NOT NULL CHECK (database_type IN ('MYSQL', 'POSTGRESQL', 'MONGODB', 'SQLSERVER')),
+--     ssl_mode VARCHAR(50) CHECK (ssl_mode IN ('DISABLE', 'PREFERRE', 'REQUIRE')),
+--     host VARCHAR(255) NOT NULL,
+--     port INT NOT NULL,
+--     connection_string VARCHAR(10000),
+--     table_include_list VARCHAR(10000),
+--     schema_include_list VARCHAR(10000),
+--     collection_include_list TEXT,
+--     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+-- );
+
 CREATE TABLE IF NOT EXISTS admins (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(255) NOT NULL UNIQUE,
@@ -35,31 +54,32 @@ CREATE TABLE IF NOT EXISTS admins (
     database_username VARCHAR(255) NOT NULL,
     database_password VARCHAR(255) NOT NULL,
     database_type VARCHAR(50) NOT NULL CHECK (database_type IN ('MYSQL', 'POSTGRESQL', 'MONGODB', 'SQLSERVER')),
-    ssl_mode VARCHAR(50) CHECK (ssl_mode IN ('DISABLE', 'PREFERRE', 'REQUIRE')),
+    ssl_mode VARCHAR(50) CHECK (ssl_mode IN ('DISABLE', 'PREFER', 'REQUIRE')),
     host VARCHAR(255) NOT NULL,
     port INT NOT NULL,
-    connection_string VARCHAR(10000),
-    table_include_list VARCHAR(10000),
-    schema_include_list VARCHAR(10000),
+    connection_string TEXT,
+    table_include_list TEXT,
+    schema_include_list TEXT,
     collection_include_list TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-ALTER
-TABLE admins ALTER
-COLUMN connection_string SET DATA TYPE TEXT;
 
-ALTER
- TABLE admins ALTER
- COLUMN table_include_list SET DATA TYPE TEXT;
+-- ALTER
+-- TABLE admins ALTER
+-- COLUMN connection_string SET DATA TYPE TEXT;
 
- ALTER
- TABLE admins ALTER
- COLUMN schema_include_list SET DATA TYPE TEXT;
+-- ALTER
+--  TABLE admins ALTER
+--  COLUMN table_include_list SET DATA TYPE TEXT;
 
- ALTER
- TABLE admins ALTER
- COLUMN collection_include_list SET DATA TYPE TEXT;
+--  ALTER
+--  TABLE admins ALTER
+--  COLUMN schema_include_list SET DATA TYPE TEXT;
+
+--  ALTER
+--  TABLE admins ALTER
+--  COLUMN collection_include_list SET DATA TYPE TEXT;
 
 -- Tạo bảng applications
 CREATE TABLE IF NOT EXISTS applications (
@@ -175,7 +195,7 @@ CREATE TABLE IF NOT EXISTS routes (
 );
 
 
--- able": "users",
+-- table": "users",
 --     "passwordAttribute": "password",
 --     "usernameAttribute": "username",
 --     "hashingType": "BCRYPT",

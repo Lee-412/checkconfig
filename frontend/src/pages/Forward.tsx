@@ -200,10 +200,9 @@ const Forward = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-6">
-      <div className="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+      <div className="w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row">
         {/* Sidebar */}
-        <div className="w-full md:w-1/4 bg-gray-50 dark:bg-gray-700 p-6 border-r dark:border-gray-600">
+        <div className=" bg-gray-50 dark:bg-gray-700 p-6 border-r dark:border-gray-600">
           <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-6">
             Progress
           </h3>
@@ -554,7 +553,6 @@ const Forward = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

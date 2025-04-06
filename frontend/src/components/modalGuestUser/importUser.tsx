@@ -13,7 +13,7 @@ import { TableConfig, tableSchema, DbConfig } from "../../api/type"; // Adjust p
 interface ImportUserProps {
   isOpen: boolean;
   onClose: () => void;
-  onImport: (fileContent: string) => void;
+  onImport: (fileContent: File) => void;
 }
 
 interface UserPreview {
@@ -110,20 +110,29 @@ const ImportUser = ({ isOpen, onClose, onImport }: ImportUserProps) => {
   };
 
   const handleImport = () => {
-    if (previewData.length > 0 && userTableSchema) {
-      const headers = userTableSchema.columns.map((col) => col.name).join(",");
-      const csvContent =
-        headers +
-        "\n" +
-        previewData
-          .map((user) =>
-            userTableSchema.columns.map((col) => user[col.name]).join(",")
-          )
-          .join("\n");
-      onImport(csvContent);
-      setPreviewData([]);
-      setFile(null);
-    }
+    // if (previewData.length > 0 && userTableSchema) {
+    //   const headers = userTableSchema.columns.map((col) => col.name).join(",");
+    //   const csvContent =
+    //     headers +
+    //     "\n" +
+    //     previewData
+    //       .map((user) =>
+    //         userTableSchema.columns.map((col) => user[col.name]).join(",")
+    //       )
+    //       .join("\n");
+    //   onImport();
+    //   setPreviewData([]);
+    //   setFile(null);
+    // }
+  
+    if (file) {
+      // Gọi hàm onImport và truyền trực tiếp tệp
+      onImport(file);
+  
+      // Reset lại state sau khi import
+      setPreviewData([]);  // Xóa preview data (nếu cần)
+      setFile(null);        // Xóa file đã chọn
+    } 
   };
 
   if (tableLoading || dbLoading) {

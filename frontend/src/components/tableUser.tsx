@@ -225,7 +225,7 @@ const TableUser = ({ users }: TableUserProps) => {
     }
   };
 
-  const handleImportUsers = async (fileContent: string) => {
+  const handleImportUsers = async (fileContent: File) => {
     try {
       createBulkUsersMutation.mutate(fileContent, {
         onSuccess: () => {
@@ -301,12 +301,12 @@ const TableUser = ({ users }: TableUserProps) => {
             >
               Username <ArrowUpDown className="inline w-4 h-4 ml-1" />
             </TableHead>
-            <TableHead
+            {/* <TableHead
               className="cursor-pointer"
               onClick={() => handleSort("password")}
             >
               Password <ArrowUpDown className="inline w-4 h-4 ml-1" />
-            </TableHead>
+            </TableHead> */}
             <TableHead
               className="cursor-pointer"
               onClick={() => handleSort("createdAt")}
@@ -346,7 +346,7 @@ const TableUser = ({ users }: TableUserProps) => {
                 </TooltipProvider>
               </TableCell>
               <TableCell>{user.username}</TableCell>
-              <TableCell>{user.password}</TableCell>
+              {/* <TableCell>{user.password}</TableCell> */}
               <TableCell>
                 {new Date(user.createdAt).toISOString().split("T")[0]}
               </TableCell>

@@ -7,11 +7,12 @@ import {
   DialogDescription,
 } from "../ui/dialog";
 import { Button } from "../ui/button";
+import { toast } from "react-toastify";
 
 interface ImportUserProps {
   isOpen: boolean;
   onClose: () => void;
-  onImport: (fileContent: string) => void;
+  onImport: (fileContent: File) => void;
 }
 
 interface UserPreview {
@@ -57,16 +58,16 @@ const ImportUser = ({ isOpen, onClose, onImport }: ImportUserProps) => {
       return;
     }
 
-    const headers = rows[0].split(",").map((h) => h.trim().toLowerCase());
-    if (
-      headers.length !== 2 ||
-      headers[0] !== "username" ||
-      headers[1] !== "password"
-    ) {
-      setError("CSV must have exactly two columns: 'username' and 'password'");
-      setPreviewData([]);
-      return;
-    }
+    // const headers = rows[0].split(",").map((h) => h.trim().toLowerCase());
+    // if (
+    //   headers.length !== 2 ||
+    //   headers[0] !== "username" ||
+    //   headers[1] !== "password"
+    // ) {
+    //   setError("CSV must have exactly two columns: 'username' and 'password'");
+    //   setPreviewData([]);
+    //   return;
+    // }
 
     const parsedUsers: UserPreview[] = rows.slice(1).map((row) => {
       const [username, password] = row.split(",").map((v) => v.trim());
@@ -89,20 +90,33 @@ const ImportUser = ({ isOpen, onClose, onImport }: ImportUserProps) => {
     setPreviewData(parsedUsers);
   };
 
-  const handleImport = () => {
-    if (previewData.length > 0) {
-      // Convert back to CSV string for the backend
-      const csvContent =
-        "username,password\n" +
-        previewData
-          .map((user) => `${user.username},${user.password}`)
-          .join("\n");
-      onImport(csvContent);
-      setPreviewData([]);
-      setFile(null);
-    }
-  };
-
+  // thua me r
+    // const handleImport = () => {
+    //   if (previewData.length > 0) {
+    //     // Convert back to CSV string for the backend
+    //     const csvContent =
+    //       "username,password\n" +
+    //       previewData
+    //         .map((user) => `${user.username},${user.password}`)
+    //         .join("\n");
+    //     onImport(file);
+    //     setPreviewData([]);
+    //     setFile(null);
+    //   }
+    // };
+    const handleImport = () => {
+      if (file) {
+        // Gọi hàm onImport và truyền trực tiếp tệp
+        onImport(file);
+    
+        // Reset lại state sau khi import
+        setPreviewData([]);  // Xóa preview data (nếu cần)
+        setFile(null);        // Xóa file đã chọn
+        toast.success("Your data is being imported");
+        onClose();
+      } 
+    };
+    
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>

@@ -302,7 +302,7 @@ const ConfigDBModal = ({
           <Button
             className="bg-green-500 text-white hover:bg-green-600"
             onClick={handleCheck}
-            disabled={!isFormValid || loading}
+            disabled={false || loading}
           >
             Check Connection
           </Button>

@@ -35,13 +35,13 @@ public class RouteService {
             throw new IllegalArgumentException("All fields (name, route, method, protected, description) are required");
         }
         logger.info("Checking for duplicate route: {}", dto.getRoute());
-        List<Route> routeCheck = routeRepository.findRouteByRoute(dto.getRoute());
-        logger.info("Found {} routes with route '{}': {}", routeCheck.size(), dto.getRoute(), routeCheck);
-        if (!routeCheck.isEmpty()) {
-            Route existingRoute = routeCheck.get(0);
-            logger.info("Duplicate route found: {}", existingRoute.getId());
-            throw new IllegalArgumentException("Duplicate route found: " + existingRoute.getId());
-        }
+        // List<Route> routeCheck = routeRepository.findRouteByRoute(dto.getRoute());
+        // logger.info("Found {} routes with route '{}': {}", routeCheck.size(), dto.getRoute(), routeCheck);
+        // if (!routeCheck.isEmpty()) {
+        //     Route existingRoute = routeCheck.get(0);
+        //     logger.info("Duplicate route found: {}", existingRoute.getId());
+        //     throw new IllegalArgumentException("Duplicate route found: " + existingRoute.getId());
+        // }
 
         Route route = routeMapper.toEntity(dto);
         UUID generatedId = UUID.randomUUID();

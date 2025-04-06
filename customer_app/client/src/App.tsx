@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useConfirmBox } from './useComfirmBox';
 
 // Định nghĩa interface cho Item
 interface Item {
@@ -26,7 +27,7 @@ function Login() {
     console.log(username, password);
 
     try {
-      const res = await fetch('http://192.168.2.14:8081/login', {
+      const res = await fetch('http://localhost/api/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,8 +35,11 @@ function Login() {
         credentials: 'omit',
         body: JSON.stringify({ username, password }),
       });
-
+      
       const data = await res.json();
+      
+      console.log("fucking data: " + JSON.stringify(data)); 
+      
       if (res.ok) {
         localStorage.setItem('token', data.token);
         window.location.href = '/items';
@@ -187,7 +191,7 @@ function ItemsPremium() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false); // Phân biệt create hay edit
   const [editItemId, setEditItemId] = useState<number | null>(null); // ID của item đang edit
-
+  const {confirmBox, ConfirmModal} = useConfirmBox();
   useEffect(() => {
     fetchItems();
   }, []);
@@ -195,7 +199,7 @@ function ItemsPremium() {
   const fetchItems = async () => {
     setError('');
     try {
-      const res = await fetch('http://192.168.2.14:8081/vipitems', {
+      const res = await fetch('http://localhost/api/vipitems', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -220,7 +224,7 @@ function ItemsPremium() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://192.168.2.14:8081/vipitems', {
+      const res = await fetch('http://localhost/api/vipitems', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -247,7 +251,7 @@ function ItemsPremium() {
     if (editItemId === null) return;
     setError('');
     try {
-      const res = await fetch(`http://192.168.2.14:8081/vipitems/${editItemId}`, {
+      const res = await fetch(`http://localhost/api/vipitems/${editItemId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -274,7 +278,7 @@ function ItemsPremium() {
   const handleDelete = async (id: number) => {
     setError('');
     try {
-      const res = await fetch(`http://192.168.2.14:8081/vipitems/${id}`, {
+      const res = await fetch(`http://localhost/api/vipitems/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -670,7 +674,7 @@ function Items() {
   const fetchItems = async () => {
     setError('');
     try {
-      const res = await fetch('http://192.168.2.14:8081/items', {
+      const res = await fetch('http://localhost/api/api/items', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -695,7 +699,7 @@ function Items() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://192.168.2.14:8081/items', {
+      const res = await fetch('http://localhost/api/items', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -722,7 +726,7 @@ function Items() {
     if (editItemId === null) return;
     setError('');
     try {
-      const res = await fetch(`http://192.168.2.14:8081/items/${editItemId}`, {
+      const res = await fetch(`http://localhost/api/items/${editItemId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -750,7 +754,7 @@ function Items() {
     setError('');
     console.log("id", id)
     try {
-      const res = await fetch(`http://192.168.2.14:8081/items/${id}`, {
+      const res = await fetch(`http://localhost/api/items/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -1143,7 +1147,7 @@ function Users() {
   const fetchUsers = async () => {
     setError('');
     try {
-      const res = await fetch('http://192.168.2.14:8081/users', {
+      const res = await fetch('http://localhost/api/users', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -1170,7 +1174,7 @@ function Users() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://192.168.2.14:8081/register', {
+      const res = await fetch('http://localhost/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1199,7 +1203,7 @@ function Users() {
 
     setError('');
     try {
-      const res = await fetch(`http://192.168.2.14:8081/users/${editUserId}`, {
+      const res = await fetch(`http://localhost/api/users/${editUserId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1226,7 +1230,7 @@ function Users() {
   const handleDelete = async (id: number) => {
     setError('');
     try {
-      const res = await fetch(`http://192.168.2.14:8081/users/${id}`, {
+      const res = await fetch(`http://localhost/api/users/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

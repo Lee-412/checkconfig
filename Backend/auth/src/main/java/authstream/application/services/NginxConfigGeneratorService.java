@@ -24,7 +24,7 @@ public class NginxConfigGeneratorService {
     }
 
     public String generateJsConfig(String authServer, String appServerDomain) throws IOException {
-        Path jsTemplatePath = Paths.get("src/main/java/authstream/resources/templates/authstream.js").toAbsolutePath();
+        Path jsTemplatePath = Paths.get("/home/lehien/Workspace/check-config/Backend/auth/src/main/java/authstream/resources/templates/authstream.js").toAbsolutePath();
         System.out.println("Using template: " + jsTemplatePath.toString());
         String jsContent = Files.readString(jsTemplatePath);
 

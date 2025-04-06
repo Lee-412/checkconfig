@@ -60,16 +60,16 @@ public class Admin {
     @Column(name = "ssl_mode") 
     private SSL_Mode sslMode;
 
-    @Column(name = "connection_string")
+    @Column(name = "connection_string", columnDefinition = "TEXT")
     private String connectionString;
 
-    @Column(name = "table_include_list",nullable= true)   // "["table1", "table2", ...]" 
+    @Column(name = "table_include_list",nullable= true, columnDefinition = "TEXT")   // "["table1", "table2", ...]" 
     private String tableIncludeList;
 
-    @Column(name = "schema_include_list",nullable= true)    // "["table1", "table2", ...]" 
+    @Column(name = "schema_include_list",nullable= true, columnDefinition = "TEXT")    // "["table1", "table2", ...]" 
     private String schemaIncludeList;
 
-    @Column(name = "collection_include_list" ,nullable= true)  // "["table1", "table2", ...]" 
+    @Column(name = "collection_include_list" ,nullable= true, columnDefinition = "TEXT")  // "["table1", "table2", ...]" 
     private String collectionIncludeList;
 
     @Column(name = "created_at", nullable = false)

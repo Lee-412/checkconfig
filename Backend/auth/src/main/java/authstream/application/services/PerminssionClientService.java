@@ -58,6 +58,10 @@ public class PerminssionClientService {
             } else {
                 tokenString = authHeader;
             }
+            System.out.println("djt me token string");
+            System.out.println(authHeader);
+            System.out.println(tokenString);
+
             TokenEntry tokenEntry = TokenStoreService.read(tokenString);
             if (tokenEntry == null || tokenEntry.isExpired()) {
                 logger.warn("Invalid or expired token: {}", tokenString);

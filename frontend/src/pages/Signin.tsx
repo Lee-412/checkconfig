@@ -257,8 +257,18 @@ const SignIn = () => {
   const handleSubmitConfig = async () => {
     // setPreviewDataModalOpen(false);
     // setTableConfigModalOpen(true);
+    const connStr = getConnectionString();
+    console.log("vaicaloon connStr: " + connStr);
+
+    setConfig(
+      {...config, connectionString: connStr }
+    )
+    const updatedConfig = { ...config, connectionString: connStr };
+
+    console.log("sjt htmWJK", config);
+    
     try {
-      submitConfigMutation.mutate(config, {
+      submitConfigMutation.mutate(updatedConfig, {
         onSuccess: () => {
           toast.success("Configuration submitted successfully!");
           setPreviewDataModalOpen(false);

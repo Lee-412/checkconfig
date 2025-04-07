@@ -199,7 +199,7 @@ function ItemsPremium() {
   const fetchItems = async () => {
     setError('');
     try {
-      const res = await fetch('http://localhost/api/vipitems', {
+      const res = await fetch('http://localhost/api/api/vipitems', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -224,7 +224,7 @@ function ItemsPremium() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost/api/vipitems', {
+      const res = await fetch('http://localhost/api/api/vipitems', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -251,7 +251,7 @@ function ItemsPremium() {
     if (editItemId === null) return;
     setError('');
     try {
-      const res = await fetch(`http://localhost/api/vipitems/${editItemId}`, {
+      const res = await fetch(`http://localhost/api/api/vipitems/${editItemId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -278,7 +278,7 @@ function ItemsPremium() {
   const handleDelete = async (id: number) => {
     setError('');
     try {
-      const res = await fetch(`http://localhost/api/vipitems/${id}`, {
+      const res = await fetch(`http://localhost/api/api/vipitems/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -699,7 +699,7 @@ function Items() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost/api/items', {
+      const res = await fetch('http://localhost/api/api/items', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -726,7 +726,7 @@ function Items() {
     if (editItemId === null) return;
     setError('');
     try {
-      const res = await fetch(`http://localhost/api/items/${editItemId}`, {
+      const res = await fetch(`http://localhost/api/api/items/${editItemId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -754,7 +754,7 @@ function Items() {
     setError('');
     console.log("id", id)
     try {
-      const res = await fetch(`http://localhost/api/items/${id}`, {
+      const res = await fetch(`http://localhost/api/api/items/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -1147,7 +1147,7 @@ function Users() {
   const fetchUsers = async () => {
     setError('');
     try {
-      const res = await fetch('http://localhost/api/users', {
+      const res = await fetch('http://localhost/api/api/users', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -1174,7 +1174,7 @@ function Users() {
     e.preventDefault();
     setError('');
     try {
-      const res = await fetch('http://localhost/api/register', {
+      const res = await fetch('http://localhost/api/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1203,7 +1203,7 @@ function Users() {
 
     setError('');
     try {
-      const res = await fetch(`http://localhost/api/users/${editUserId}`, {
+      const res = await fetch(`http://localhost/api/api/users/${editUserId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1230,7 +1230,7 @@ function Users() {
   const handleDelete = async (id: number) => {
     setError('');
     try {
-      const res = await fetch(`http://localhost/api/users/${id}`, {
+      const res = await fetch(`http://localhost/api/api/users/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

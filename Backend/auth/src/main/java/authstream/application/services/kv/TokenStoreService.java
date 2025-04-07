@@ -15,7 +15,16 @@ public class TokenStoreService {
         if (tokenKey == null || tokenEntry == null) {
             throw new IllegalArgumentException("Token key and entry must not be null");
         }
-        tokenStore.putIfAbsent(tokenKey, tokenEntry);
+
+        System.out.println("Anh yeu em My a");
+        System.out.println(tokenKey);
+        System.out.println(tokenEntry);
+        if (tokenStore.containsKey(tokenKey)) {
+            System.out.println("Dit con me co" + tokenKey);
+        } else {
+            tokenStore.put(tokenKey, tokenEntry);
+            System.out.println("Dit con me ko co" + tokenKey);
+        }
         return tokenEntry;
     }
 

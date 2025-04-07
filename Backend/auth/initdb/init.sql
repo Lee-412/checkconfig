@@ -195,7 +195,7 @@ CREATE TABLE IF NOT EXISTS routes (
 );
 
 
--- table": "users",
+-- userTable": "users",
 --     "passwordAttribute": "password",
 --     "usernameAttribute": "username",
 --     "hashingType": "BCRYPT",

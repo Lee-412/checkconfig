@@ -99,15 +99,5 @@ public class AuthUtils {
         }
     }
 
-    // Tạo response cho token
-    public static Map<String, Object> buildTokenResponse(String token, TokenEntry entry, String message) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("token", token);
-        response.put("username", entry.getMessage().getBody());
-        response.put("createdAt", entry.getCreatedAt().toString());
-        response.put("expiredAt", entry.getExpired().toString());
-        response.put("ttl", entry.getRemainingTTL());
-        response.put("message", message);
-        return response;
-    }
+  
 }

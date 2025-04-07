@@ -76,7 +76,7 @@ export const createUser = async(req, res) => {
     console.log(authData);
     const { id } = req.params;
     const { username, password, role } = req.body;
-    const hashedPassword = await bcrypt.hash(password)
+    const hashedPassword = await bcrypt.hash(password, 10)
     
     try {
       const exists = await pool.query("SELECT username FROM users WHERE id = $1", [id])

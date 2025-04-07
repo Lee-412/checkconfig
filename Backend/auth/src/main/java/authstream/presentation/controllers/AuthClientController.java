@@ -50,11 +50,11 @@ public class AuthClientController {
 
         TokenStoreService.getAllTokenEntries().forEach((key, entry) -> {
             Map<String, Object> tokenData = new HashMap<>();
-            tokenData.put("body", entry.getMessage().getBody());
-            tokenData.put("createdAt", entry.getCreatedAt());
-            tokenData.put("expiredAt", entry.getExpired());
-            tokenData.put("remainingTTL", entry.getRemainingTTL());
-            tokenData.put("isExpired", entry.isExpired());
+            // tokenData.put("body", entry.getMessage().getBody());
+            // tokenData.put("createdAt", entry.getCreatedAt());
+            // tokenData.put("expiredAt", entry.getExpired());
+            // tokenData.put("remainingTTL", entry.getRemainingTTL());
+            // tokenData.put("isExpired", entry.isExpired());
 
             response.put(key, tokenData);
         });
@@ -219,6 +219,9 @@ public class AuthClientController {
 
             requestBodyMap.put("authData", authResult.getLeft());
             logger.info("Authentication successful for user: {}", username);
+            System.out.println("requestBodyMap");
+
+            System.out.println(requestBodyMap.toString()    );
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(requestBodyMap);
         } catch (Exception e) {
             logger.error("Authentication error for user: {}", username, e);

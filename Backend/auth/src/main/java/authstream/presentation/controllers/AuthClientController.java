@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -183,23 +184,19 @@ public class AuthClientController {
         return uri != null && uri.contains("/login");
     }
 
+    @Cacheable(value = "login", key = "#username + '-' + #token")
     private ResponseEntity<Map<String, Object>> handleLoginRequest(Map<String, Object> requestBodyMap,
             String authHeader) {
         String username = (String) requestBodyMap.get("username");
         String password = (String) requestBodyMap.get("password");
 
         String token = null;
-        System.out.println("djt auth auth check");
 
         System.out.println(authHeader);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
         }
-        System.out.println("djt token is ");
-        System.out.println(token);
-        System.out.println("djt auth auth nginx");
-        System.out.println(authHeader);
 
         if (username == null || password == null) {
             logger.warn("Login attempt with missing credentials");
@@ -207,9 +204,6 @@ public class AuthClientController {
         }
 
         try {
-            System.out.println("djt token auth nginx");
-            System.out.println(token);
-
             Pair<Object, Object> authResult = authService.login(username, password, token);
 
             if (authResult.getRight() != null) {

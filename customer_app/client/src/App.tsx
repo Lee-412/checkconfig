@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useConfirmBox } from './useComfirmBox';
+import { Toaster , toast } from 'sonner';
 
 // Định nghĩa interface cho Item
 interface Item {
@@ -41,7 +42,7 @@ function Login() {
       console.log("fucking data: " + JSON.stringify(data)); 
       
       if (res.ok) {
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('token', data.authData);
         window.location.href = '/items';
       } else {
         setError(`Login failed: ${res.status}`);
@@ -191,7 +192,6 @@ function ItemsPremium() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false); // Phân biệt create hay edit
   const [editItemId, setEditItemId] = useState<number | null>(null); // ID của item đang edit
-  const {confirmBox, ConfirmModal} = useConfirmBox();
   useEffect(() => {
     fetchItems();
   }, []);
@@ -209,12 +209,17 @@ function ItemsPremium() {
 
       const data = await res.json();
       if (res.ok) {
+        toast.success("get items premium successfully");
         setItems(Array.isArray(data) ? data : []);
       } else {
+        toast.warning("You don't have Permission to access this action");
+
         console.log("bug in res", res.status);
         setItems([]);
       }
     } catch (err) {
+      toast.error("something wrong");
+
       setError(`Error: ${err}`);
       setItems([]);
     }
@@ -235,9 +240,13 @@ function ItemsPremium() {
 
       if (res.ok) {
         fetchItems();
+        toast.success("Item premium create successfully!")
+
         resetForm();
         setIsModalOpen(false);
       } else {
+        toast.warning("you don't have permission create items premium!")
+
         console.log("bug in res", res.status);
         setError(`Create failed: ${res.status}`);
       }
@@ -259,18 +268,24 @@ function ItemsPremium() {
         },
         body: JSON.stringify({ name, description, img }),
       });
-
+      
       if (res.ok) {
         fetchItems();
+        toast.success("Item edit premium successfully!")
+
         resetForm();
         setIsModalOpen(false);
         setIsEditMode(false);
         setEditItemId(null);
       } else {
+        toast.warning("You don't have permission edit Items premium");
+
         console.log("bug in res", res.status);
         setError(`Edit failed: ${res.status}`);
       }
     } catch (err) {
+      toast.error("Something wrong with server");
+
       setError(`Error: ${err}`);
     }
   };
@@ -288,11 +303,14 @@ function ItemsPremium() {
 
       if (res.ok) {
         fetchItems();
+        toast.success("Item premium deleted successfully!")
       } else {
+        toast.warning("You don't have permission delete Items premium");
         console.log("bug in res", res.status);
         setError(`Delete failed: ${res.status}`);
       }
     } catch (err) {
+      toast.error("Something wrong with server");
       setError(`Error: ${err}`);
     }
   };
@@ -307,7 +325,8 @@ function ItemsPremium() {
   const openEditModal = (item: Item) => {
     setName(item.name);
     setDescription(item.description);
-    setImg(item.img);
+    setImg(item.img);        
+
     setEditItemId(item.id);
     setIsEditMode(true);
     setIsModalOpen(true);
@@ -324,6 +343,7 @@ function ItemsPremium() {
       flexDirection: 'column',
       alignItems: 'center'
     }}>
+
       <h1 style={{
         textAlign: 'center',
         marginBottom: '25px',
@@ -379,6 +399,7 @@ function ItemsPremium() {
       >
         Add New Premium Item
       </button>
+      <Toaster position="top-right" richColors />
 
       {/* Modal */}
       {isModalOpen && (
@@ -551,8 +572,8 @@ function ItemsPremium() {
 
       <table
         style={{
-          width: '80%',
-          maxWidth: '800px',
+          width: '100%',
+          maxWidth: '1200px',
           borderCollapse: 'separate',
           borderSpacing: '0',
           background: '#ffffff',
@@ -609,24 +630,9 @@ function ItemsPremium() {
                   >
                     Edit
                   </button>
-                  {/* <button
-                    onClick={() => handleDelete(item.id)}
-                    style={{
-                      padding: '6px 12px',
-                      background: '#e74c3c',
-                      color: '#ffffff',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      transition: 'background 0.3s ease',
-                    }}
-                    onMouseOver={(e) => (e.currentTarget.style.background = '#c0392b')}
-                    onMouseOut={(e) => (e.currentTarget.style.background = '#e74c3c')}
-                  >
-                    Delete
-                  </button> */}
+                 
                   <button
-                    onClick={() => confirmBox(`Delete item "${item.name}"?`, () => handleDelete(item.id))}
+                    onClick={() => handleDelete(item.id)}
                     style={{
                       padding: '6px 12px',
                       background: '#e74c3c',
@@ -685,12 +691,16 @@ function Items() {
       const data = await res.json();
       if (res.ok) {
         setItems(Array.isArray(data) ? data : []);
+        toast.success('Items fetched successfully');
       } else {
         console.log("bug in res", res.status);
         setItems([]);
+        toast.warning("You don't have permission");
       }
     } catch (err) {
       setError(`Error: ${err}`);
+      toast.error("Something wrong with server");
+
       setItems([]);
     }
   };
@@ -711,8 +721,12 @@ function Items() {
       if (res.ok) {
         fetchItems();
         resetForm();
+        toast.success(
+          'Item created successfully'
+        )
         setIsModalOpen(false);
       } else {
+        toast.warning("You don't have permission create items")
         console.log("bug in res", res.status);
         setError(`Create failed: ${res.status}`);
       }
@@ -737,16 +751,23 @@ function Items() {
 
       if (res.ok) {
         fetchItems();
+        toast.success(
+          'Item updated successfully'
+        )
         resetForm();
         setIsModalOpen(false);
         setIsEditMode(false);
         setEditItemId(null);
       } else {
+        toast.warning("You don't have permission edit items")
+
         console.log("bug in res", res.status);
         setError(`Edit failed: ${res.status}`);
       }
     } catch (err) {
       setError(`Error: ${err}`);
+      toast.error("something wrong with server")
+
     }
   };
 
@@ -764,12 +785,17 @@ function Items() {
 
       if (res.ok) {
         fetchItems();
+        toast.success('Item deleted successfully');
       } else {
+        toast.warning("You don't have permission delete items")
+
         console.log("bug in res", res.status);
         setError(`Delete failed: ${res.status}`);
       }
     } catch (err) {
       setError(`Error: ${err}`);
+      toast.error("Something went wrong")
+
     }
   };
 
@@ -855,6 +881,7 @@ function Items() {
       >
         Add New Item
       </button>
+      <Toaster position="top-right" richColors />
 
       {/* Modal */}
       {isModalOpen && (
@@ -1027,8 +1054,8 @@ function Items() {
 
       <table
         style={{
-          width: '80%',
-          maxWidth: '800px',
+          width: '100%',
+          maxWidth: '1200px',
           borderCollapse: 'separate',
           borderSpacing: '0',
           background: '#ffffff',
@@ -1160,11 +1187,16 @@ function Users() {
 
       if (res.ok && Array.isArray(data)) {
         setUsers(data);
+        toast.success("User fetched successfully");
       } else {
+        toast.warning("You don't have permission with get user");
+
         console.log("bug in res", res.status);
         setUsers([]);
       }
     } catch (err) {
+      toast.error("something wrong");
+
       setError(`Error: ${err}`);
       setUsers([]);
     }
@@ -1185,9 +1217,12 @@ function Users() {
 
       if (res.ok) {
         fetchUsers();
+        toast.success("created successfully");
         resetForm();
         setIsModalOpen(false);
       } else {
+        toast.warning("you don't have permission to action");
+
         console.log("bug in res", res.status);
         setError(`Create failed: ${res.status}`);
       }
@@ -1294,12 +1329,14 @@ function Users() {
           padding: '8px',
           background: '#ffe6e6',
           borderRadius: '4px',
-          width: '80%',
-          maxWidth: '800px'
+          width: '100%',
+          maxWidth: '1200px'
         }}>
           {error}
         </p>
       )}
+      <Toaster position="top-right" richColors />
+
       <button
         onClick={() => {
           resetForm();
@@ -1507,9 +1544,9 @@ function Users() {
 
       <table
         style={{
-          width: '80%',
-          maxWidth: '800px',
-          borderCollapse: 'separate',
+          width: '100%',
+          maxWidth: '1200px',
+                    borderCollapse: 'separate',
           borderSpacing: '0',
           background: '#ffffff',
           boxShadow: '0 4px 15px rgba(0,0,0,0.05)',

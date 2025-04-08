@@ -36,8 +36,8 @@ public class UserService {
     private UserRepository userRepository;
 
     private static final String DEFAULT_SALT = "$2a$12$Gbe4AzAQpfwu5bYRWhpiD.";
-    private static final int DEFAULT_WORK_FACTOR = 12;
-    private static final int THREAD_POOL_SIZE = 8; // Số thread tối đa
+    private static final int DEFAULT_WORK_FACTOR = 1;
+    private static final int THREAD_POOL_SIZE = 16; // Số thread tối đa
     BcryptConfig bcryptConfig = BcryptConfig.builder()
             .salt(DEFAULT_SALT)
             .workFactor(DEFAULT_WORK_FACTOR)

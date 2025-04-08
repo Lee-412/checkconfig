@@ -52,8 +52,16 @@ public class AuthService {
         HashingType hashingType = config.getHashingType();
         Object hashConfig = AuthUtils.parseHashConfigFromJson(config.getHashConfig(), hashingType);
 
+        long startTime = System.nanoTime();
+
         String hashedInput = HashingService.hash(password, hashingType, hashConfig);
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime) / 1_000_000; // Convert from nanoseconds to milliseconds
+        System.out.println("Password hashing took: " + duration + " milliseconds.");
+        startTime = System.nanoTime();
         String storedHash = AuthUtils.fetchUserPassword(username, userTable, passwordAttribute, jdbcTemplate);
+        duration = (System.nanoTime() - startTime) / 1_000_000;
+        System.out.println("Fetching user password took: " + duration + " milliseconds.");
         System.out.println("storedHash: " + storedHash);
         if (storedHash == null) {
             // throw new IllegalArgumentException("User not found");
@@ -62,7 +70,9 @@ public class AuthService {
         }
 
         if (hashingType == HashingType.BCRYPT) {
+            startTime = System.nanoTime();
             boolean matches = BCrypt.checkpw(password, storedHash);
+            System.out.println((System.nanoTime() - startTime) / 1_000_000 + " Check hash");
             System.out.println("Password matches: " + matches);
             if (!matches) {
                 // throw new IllegalArgumentException("Invalid username or password");
